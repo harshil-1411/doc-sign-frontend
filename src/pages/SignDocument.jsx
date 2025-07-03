@@ -57,15 +57,20 @@ export default function SignDocument() {
 
   // Effect to update canvasRect when PDF is rendered or window is resized
   useEffect(() => {
+    let interval;
     const updateCanvasRect = () => {
       const canvas = document.querySelector('.rpv-core__canvas-layer canvas');
       if (canvas) {
         setCanvasRect(canvas.getBoundingClientRect());
+        clearInterval(interval);
       }
     };
-    updateCanvasRect();
+    interval = setInterval(updateCanvasRect, 200); // Check every 200ms
     window.addEventListener('resize', updateCanvasRect);
-    return () => window.removeEventListener('resize', updateCanvasRect);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', updateCanvasRect);
+    };
   }, [pdfUrl, loading]);
 
   const handleDrop = (pos) => {

@@ -18,7 +18,7 @@ export default function DraggableSignature({ text, font, onDrop }) {
       padding: '4px 12px',
       borderRadius: 6,
       cursor: 'grab',
-      zIndex: 10,
+      zIndex: 50,
       userSelect: 'none',
       opacity: isDragging ? 0.7 : 1,
     };

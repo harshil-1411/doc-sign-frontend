@@ -13,7 +13,7 @@ export default function Navbar() {
   return (
     <nav className="bg-blue-600 text-white px-6 py-3 flex justify-between items-center shadow">
       <div className="font-bold text-lg">
-        <Link to="/dashboard">SignEase</Link>
+        <Link to="/dashboard">Signsy</Link>
       </div>
       <div className="flex items-center gap-4">
         {user && <span className="hidden sm:inline">Hello, {user.name}</span>}

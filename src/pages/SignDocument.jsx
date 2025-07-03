@@ -27,15 +27,15 @@ export default function SignDocument() {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get(`/api/documents/${JSON.parse(localStorage.getItem('user')).id}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/documents/${JSON.parse(localStorage.getItem('user')).id}`);
         const found = res.data.documents.find(d => d._id === docId);
         setDoc(found);
         if (found) {
           let pdfEndpoint;
           if (found.status === 'signed') {
-            pdfEndpoint = `/api/documents/signed/${found.userId}/${found.filename}`;
+            pdfEndpoint = `${import.meta.env.VITE_API_URL}/api/documents/signed/${found.userId}/${found.filename}`;
           } else {
-            pdfEndpoint = `/api/documents/${found.userId}/${found.filename}`;
+            pdfEndpoint = `${import.meta.env.VITE_API_URL}/api/documents/${found.userId}/${found.filename}`;
           }
           const pdfRes = await axios.get(pdfEndpoint, {
             responseType: 'blob',
@@ -88,7 +88,7 @@ export default function SignDocument() {
     setSignError('');
     setSuccess('');
     try {
-      await axios.post('/api/documents/sign', {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/documents/sign`, {
         filename: doc.filename,
         userId: doc.userId,
         pageNumber: 0, // For now, assume first page
@@ -109,7 +109,7 @@ export default function SignDocument() {
   const handleDownload = async () => {
     if (!doc) return;
     try {
-      const res = await axios.get(`/api/documents/signed/${doc.userId}/${doc.filename}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/documents/signed/${doc.userId}/${doc.filename}`, {
         responseType: 'blob',
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });

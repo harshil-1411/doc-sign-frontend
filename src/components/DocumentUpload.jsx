@@ -26,7 +26,7 @@ export default function DocumentUpload({ onUpload }) {
     setSuccess('');
     setProgress(0);
     try {
-      const res = await axios.post('/api/documents/upload', formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/documents/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           setProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));

@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, form);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, form);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       window.location.href = "/dashboard";

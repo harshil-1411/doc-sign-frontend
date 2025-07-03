@@ -18,7 +18,8 @@ export default function DocumentList({ refresh }) {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/documents/${user.id}`);
+      //api changes
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${user.id}`);
       setDocuments(res.data.documents);
     } catch (err) {
       setError('Failed to fetch documents');
@@ -34,7 +35,7 @@ export default function DocumentList({ refresh }) {
   const handleDelete = async (filename) => {
     if (!window.confirm('Are you sure you want to delete this document?')) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/documents/${user.id}/${filename}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${user.id}/${filename}`);
       fetchDocuments();
     } catch (err) {
       alert('Failed to delete document');
@@ -47,7 +48,7 @@ export default function DocumentList({ refresh }) {
 
   const handleView = async (doc) => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/documents/${doc.userId}/${doc.filename}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${doc.userId}/${doc.filename}`, {
         responseType: 'blob',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

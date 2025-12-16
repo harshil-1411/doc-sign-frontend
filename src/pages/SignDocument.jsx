@@ -79,22 +79,11 @@ export default function SignDocument() {
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
   
-    console.log('--- Handle Drop Debug ---');
-    console.log('Drop Pos (Relative to Container):', pos);
-    console.log('Canvas Rect:', rect);
-    console.log('Scale:', scaleX, scaleY);
-
-    const xOnCanvas = pos.x * scaleX + 12; 
-    const yOnCanvas = pos.y * scaleY + 30; 
-    
-    console.log('X/Y On Canvas (Pixels):', xOnCanvas, yOnCanvas);
-    console.log('Canvas Dimensions (Internal):', canvas.width, canvas.height);
-
+    const xOnCanvas = (pos.x - rect.left) * scaleX;
+    const yOnCanvas = (pos.y - rect.top) * scaleY;
+  
     const xPercent = xOnCanvas / canvas.width;
-    const yPercent = 1 - (yOnCanvas / canvas.height); // Restoring flip to bring it back on page (assuming standard PDF coords)
-
-    console.log('Final Percentages:', xPercent, yPercent);
-    console.log('-------------------------');
+    const yPercent = 1 - (yOnCanvas / canvas.height); // 🔥 Flip Y on the frontend!
   
     setSigPos({ xPercent, yPercent, pageNumber: 0 }); // Add pageNumber later if needed
   };

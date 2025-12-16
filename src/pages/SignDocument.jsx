@@ -50,12 +50,9 @@ export default function SignDocument() {
       setLoading(false);
     };
     fetchDoc();
-    // Cleanup blob URL
     return () => { if (pdfUrl) URL.revokeObjectURL(pdfUrl); };
-    // eslint-disable-next-line
   }, [docId, success]);
 
-  // Effect to update canvasRect when PDF is rendered or window is resized
   useEffect(() => {
     let interval;
     const updateCanvasRect = () => {
@@ -65,7 +62,7 @@ export default function SignDocument() {
         clearInterval(interval);
       }
     };
-    interval = setInterval(updateCanvasRect, 200); // Check every 200ms
+    interval = setInterval(updateCanvasRect, 200);
     window.addEventListener('resize', updateCanvasRect);
     return () => {
       clearInterval(interval);
@@ -73,16 +70,36 @@ export default function SignDocument() {
     };
   }, [pdfUrl, loading]);
 
+  //handle drop
   const handleDrop = (pos) => {
     const canvas = document.querySelector('.rpv-core__canvas-layer canvas');
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const xOnPage = pos.x - rect.left;
-    const yOnPage = pos.y - rect.top;
-    const xPercent = xOnPage / rect.width;
-    const yPercent = yOnPage / rect.height;
-    setSigPos({ xPercent, yPercent });
+  
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+  
+    console.log('--- Handle Drop Debug ---');
+    console.log('Drop Pos (Relative to Container):', pos);
+    console.log('Canvas Rect:', rect);
+    console.log('Scale:', scaleX, scaleY);
+
+    const xOnCanvas = pos.x * scaleX + 12; 
+    const yOnCanvas = pos.y * scaleY + 30; 
+    
+    console.log('X/Y On Canvas (Pixels):', xOnCanvas, yOnCanvas);
+    console.log('Canvas Dimensions (Internal):', canvas.width, canvas.height);
+
+    const xPercent = xOnCanvas / canvas.width;
+    const yPercent = 1 - (yOnCanvas / canvas.height); // Restoring flip to bring it back on page (assuming standard PDF coords)
+
+    console.log('Final Percentages:', xPercent, yPercent);
+    console.log('-------------------------');
+  
+    setSigPos({ xPercent, yPercent, pageNumber: 0 }); // Add pageNumber later if needed
   };
+  
+  
 
   const handleSign = async () => {
     if (!sigPos || !signature.text) {
@@ -96,7 +113,7 @@ export default function SignDocument() {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/documents/sign`, {
         filename: doc.filename,
         userId: doc.userId,
-        pageNumber: 0, // For now, assume first page
+        pageNumber: sigPos.pageNumber,
         xPercent: sigPos.xPercent,
         yPercent: sigPos.yPercent,
         signatureText: signature.text,
@@ -197,4 +214,4 @@ export default function SignDocument() {
       </div>
     </div>
   );
-} 
+}

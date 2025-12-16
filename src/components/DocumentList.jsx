@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import PDFViewerModal from './PDFViewerModal.jsx';
+import DeleteConfirmModal from './DeleteConfirmModal.jsx';
 
 export default function DocumentList({ refresh }) {
   const [documents, setDocuments] = useState([]);
@@ -12,6 +13,10 @@ export default function DocumentList({ refresh }) {
   const [modalUrl, setModalUrl] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
+  
+  // Delete Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [docToDelete, setDocToDelete] = useState(null);
 
   const fetchDocuments = async () => {
     if (!user) return;
@@ -31,15 +36,26 @@ export default function DocumentList({ refresh }) {
     fetchDocuments();
   }, [refresh, user]);
 
-//delete document
-  const handleDelete = async (filename) => {
-    if (!window.confirm('Are you sure you want to delete this document?')) return;
+  const initiateDelete = (doc) => {
+    setDocToDelete(doc);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!docToDelete) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${user.id}/${filename}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${user.id}/${docToDelete.filename}`);
       fetchDocuments();
+      setDeleteModalOpen(false);
+      setDocToDelete(null);
     } catch (err) {
       alert('Failed to delete document');
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setDocToDelete(null);
   };
 
   const handleSign = (doc) => {
@@ -98,7 +114,7 @@ export default function DocumentList({ refresh }) {
                 <td>{doc.status}</td>
                 <td className="space-x-2">
                   <button className="text-blue-600 hover:underline" onClick={() => handleSign(doc)}>View & Sign</button>
-                  <button className="text-red-600 hover:underline" onClick={() => handleDelete(doc.filename)}>Delete</button>
+                  <button className="text-red-600 hover:underline" onClick={() => initiateDelete(doc)}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -106,6 +122,12 @@ export default function DocumentList({ refresh }) {
         </table>
       )}
       <PDFViewerModal fileUrl={modalUrl} open={modalOpen} onClose={handleCloseModal} />
+      <DeleteConfirmModal 
+        isOpen={deleteModalOpen} 
+        onClose={cancelDelete} 
+        onConfirm={confirmDelete} 
+        fileName={docToDelete?.originalName} 
+      />
     </div>
   );
 } 
